@@ -13,7 +13,8 @@ public class Board : MonoBehaviour {
 	public List<Player> Players { get; set; }
 	//all the pieces on the board
 	public List<Piece> Pieces { get; set; }
-	string filePath = "C:\\Users\\maggi\\Documents\\covjece_ne_ljuti_se\\covjece_ne_ljuti_se\\Assets\\db\\tempdb.yap";
+
+	string filePath = "D:\\Unity Projects\\Covjece ne ljuti se\\covjece_ne_ljuti_se\\Assets\\db\\tempdb.yap";
 
 	// Use this for initialization
 	void Start () {
@@ -53,8 +54,10 @@ public class Board : MonoBehaviour {
 		IObjectSet result = db.QueryByExample(proto);
 		foreach (object item in result)
 		{
-			UnityEngine.Debug.Log(item.ToString());
+			UnityEngine.Debug.Log("Deleting: "+item.ToString());
+			db.Delete(item);
 		}
+		db.Commit();
 		db.Close();
 
 	}
