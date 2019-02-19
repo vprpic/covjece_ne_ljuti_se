@@ -52,4 +52,5 @@ public class LobbyScene : MonoBehaviour {
 		Client.SendMessageToServer("MSG;Listing all players...");
 		Client.PrintAllPlayers();
 	}
+	
 }

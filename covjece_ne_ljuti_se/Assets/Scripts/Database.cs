@@ -4,7 +4,6 @@ using System.Collections.Generic;
 public class Database{
 
 	private static Database instance;
-	public static IObjectContainer mClient;
 
 	public static Database Instance
 	{
@@ -20,7 +19,6 @@ public class Database{
 
 	public Database()
 	{
-		//dbContainer = CreateDatabase();
 	}
 
 	public IObjectContainer CreateDatabase(string filePath)
@@ -35,33 +33,25 @@ public class Database{
 		return server.OpenClient();
 	}
 	*/
-
+	/*
 	public Database ConnectToRealServer(string username)
 	{
-		IObjectContainer client = Db4oFactory.OpenClient("localhost", 8080, "player", "db4o-password");
-		mClient = client;
+		IObjectContainer client = Db4oFactory.OpenClient(ServerConfiguration.Host, ServerConfiguration.Port, "player", "db4o-password");
+		//mClient = client;
 		return instance;
-	}
+	}*/
 
-	public void DisconnectFromServer()
+	public static void AddPlayer(Player player)
 	{
-		if(mClient != null)
-		{
-			mClient.Close();
-		}
-	}
-
-	public void AddPlayer(Player player)
-	{
-		mClient.Store(player);
-		mClient.Commit();
+		Client.mConnection.Store(player);
+		Client.mConnection.Commit();
 	}
 	
-	public List<Player> FetchAllPlayers()
+	public static List<Player> FetchAllPlayers()
 	{
 		List<Player> players = new List<Player>();
 
-		IObjectSet result = mClient.QueryByExample(new Player());
+		IObjectSet result = Client.mConnection.QueryByExample(new Player());
 
 		while (result.HasNext())
 		{
