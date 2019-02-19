@@ -10,6 +10,7 @@ public class Client : MonoBehaviour
 	public static int MAX_PLAYERS = 4;
 	//public static Database db { get; set; }
 	public static IObjectContainer mConnection;
+	public static Player currentPlayer;
 	private static bool owner = false;
 
 	private void Start()
@@ -30,6 +31,7 @@ public class Client : MonoBehaviour
 		}
 		else
 		{
+			currentPlayer = new Player(username);
 			AddPlayer(username);
 			//PrintAllPlayers();
 			PlayerPrefs.SetString("username", username);
@@ -68,6 +70,7 @@ public class Client : MonoBehaviour
 	{
 		if (mConnection != null)
 		{
+			Database.RemoveCurrentPlayer(currentPlayer);
 			mConnection.Close();
 		}
 	}

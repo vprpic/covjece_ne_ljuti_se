@@ -1,4 +1,5 @@
 ﻿using Db4objects.Db4o;
+using System;
 using System.Collections.Generic;
 
 public class Database{
@@ -44,6 +45,12 @@ public class Database{
 	public static void AddPlayer(Player player)
 	{
 		Client.mConnection.Store(player);
+		Client.mConnection.Commit();
+	}
+
+	public static void RemoveCurrentPlayer(Player currentPlayer)
+	{
+		Client.mConnection.Delete(currentPlayer);
 		Client.mConnection.Commit();
 	}
 	
