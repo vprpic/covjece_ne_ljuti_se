@@ -1,40 +1,74 @@
 ﻿using Db4objects.Db4o;
+using System.Collections.Generic;
 
 public class Database{
-	
-	public static string FilePath = "C:\\Users\\maggi\\Documents\\covjece_ne_ljuti_se\\covjece_ne_ljuti_se\\Assets\\db\\tempdb.yap";
 
-	public IObjectContainer dbContainer;
+	private static Database instance;
+	public static IObjectContainer mClient;
+
+	public static Database Instance
+	{
+		get
+		{
+			if (instance == null)
+			{
+				instance = new Database();
+			}
+			return instance;
+		}
+	}
 
 	public Database()
 	{
-		dbContainer = CreateDatabase();
+		//dbContainer = CreateDatabase();
 	}
 
-	public IObjectContainer CreateDatabase()
+	public IObjectContainer CreateDatabase(string filePath)
 	{
-		return Db4oFactory.OpenFile(FilePath);
+		return Db4oFactory.OpenFile(filePath);
 	}
 
+	/*
 	public IObjectContainer AccessLocalServer() {
 		const int RunEmbeddedServer = 0;
 		var server =  Db4oFactory.OpenServer(FilePath, RunEmbeddedServer);
 		return server.OpenClient();
 	}
+	*/
 
-	public IObjectServer RunAsRealServer() {
-		const int RunAsRealServer = 8080;
-		var server = Db4oFactory.OpenServer(FilePath, RunAsRealServer);
-		server.GrantAccess("player", "db4o-password");
-		return server;
+	public Database ConnectToRealServer(string username)
+	{
+		IObjectContainer client = Db4oFactory.OpenClient("localhost", 8080, "player", "db4o-password");
+		mClient = client;
+		return instance;
 	}
 
-	public IObjectContainer ConnectToRealServer(string username)
+	public void DisconnectFromServer()
 	{
-		using (var db = Db4oFactory.OpenClient("localhost", 0, username, "db4o-password"))
+		if(mClient != null)
 		{
-			return db;
+			mClient.Close();
 		}
+	}
+
+	public void AddPlayer(Player player)
+	{
+		mClient.Store(player);
+		mClient.Commit();
+	}
+	
+	public List<Player> FetchAllPlayers()
+	{
+		List<Player> players = new List<Player>();
+
+		IObjectSet result = mClient.QueryByExample(new Player());
+
+		while (result.HasNext())
+		{
+			players.Add((Player) result.Next());
+		}
+
+		return players;
 	}
 
 }
