@@ -1,17 +1,24 @@
 ﻿using Db4objects.Db4o;
 using Db4objects.Db4o.Messaging;
 using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Client : ServerConfiguration
 {
+	public static int MAX_PLAYERS = 4;
 	public static Database db { get; set; }
 	private static bool owner = false;
 
-	public static Database ConnectToServer(string username)
+	public static void ConnectToServer(string username)
 	{
 		db = Database.Instance;
 		db.ConnectToRealServer(username);
-		return db;
+		AddPlayer(username);
+
+		PlayerPrefs.SetString("username", username);
+		SceneManager.LoadScene("Hub");
 	}
 	
 	public static void SendMessageToServer(string message)
@@ -46,9 +53,9 @@ public class Client : ServerConfiguration
 		SendMessageToServer("STOP");
 	}
 
-	public static void AddPlayer(int id, string screenName)
+	public static void AddPlayer(string screenName)
 	{
-		db.AddPlayer(new Player(id, screenName));
+		db.AddPlayer(new Player(screenName));
 	}
 
 	public static void PrintAllPlayers()

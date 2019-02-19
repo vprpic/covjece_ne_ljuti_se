@@ -4,7 +4,7 @@ using UnityEngine;
 using Db4objects.Db4o;
 
 public class Board : MonoBehaviour {
-
+	
 	//if there is a lobby with multiple games
 	//int boardId;
 	//number of the current turn
@@ -14,15 +14,14 @@ public class Board : MonoBehaviour {
 	//all the pieces on the board
 	public List<Piece> Pieces { get; set; }
 
-	string filePath = "D:\\Unity Projects\\Covjece ne ljuti se\\covjece_ne_ljuti_se\\Assets\\db\\tempdb.yap";
+	//string filePath = "D:\\Unity Projects\\Covjece ne ljuti se\\covjece_ne_ljuti_se\\Assets\\db\\tempdb.yap";
 
 	// Use this for initialization
 	void Start () {
-		Players = new List<Player>();
+		/*Players = new List<Player>();
 		Pieces = new List<Piece>();
 		Player player1 = new Player();
 		player1.ScreenName = "player1";
-		player1.OwnerId = 1;
 		//Database db = new Database();
 		
 		IObjectContainer db = Db4oFactory.OpenFile(filePath);
@@ -37,7 +36,6 @@ public class Board : MonoBehaviour {
 
 		Player player2 = new Player();
 		player2.ScreenName = "player2";
-		player2.OwnerId = 2;
 
 		try
 		{
@@ -59,7 +57,7 @@ public class Board : MonoBehaviour {
 		}
 		db.Commit();
 		db.Close();
-
+		*/
 	}
 
 	// Update is called once per frame

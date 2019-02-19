@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class LobbyScene : MonoBehaviour {
 	private InputField usernameInput;
@@ -22,17 +23,28 @@ public class LobbyScene : MonoBehaviour {
 		Random.InitState(22);
 		mUsername = usernameInput.text.ToString();
 		Client.ConnectToServer(mUsername);
-		Debug.Log("Connected to server");
+		UnityEngine.Debug.Log("Connected to server");
 		//Client.AddPlayer(Random.Range(0,1000), username);
 		//Client.DisconnectFromServer();
 		//Debug.Log("Disconnected from server");
+	}
+
+	public void StartConsoleServer()
+	{
+		var stringPath = Application.dataPath + "/consoleServer/consoleServer.exe";
+		UnityEngine.Debug.Log(stringPath);
+		//var myProcess = new Process();
+		Process.Start(stringPath);
+		/*myProcess.StartInfo.FileName = "";
+		myProcess.StartInfo.Arguments = stringPath;
+		myProcess.Start();*/
 	}
 
 	public void CloseServer()
 	{
 		//Client.AddPlayer(Random.Range(0, 1000), mUsername);
 		Client.CloseServer();
-		Debug.Log("Server closed");
+		UnityEngine.Debug.Log("Server closed");
 	}
 
 	public void TestConnection()
