@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 using Db4objects.Db4o;
 using Db4objects.Db4o.Config;
 using Db4objects.Db4o.Messaging;
+using Db4objects.Db4o.Query;
+using System.Collections;
+using Db4objects.Db4o.Reflect.Generic;
 
 namespace consoleServer
 {
 	class Program : ServerConfiguration, IMessageRecipient
 	{
+		private static Program instance;
+		private static IObjectServer server;
+		private static IObjectContainer client;
 		/// <summary>
 		/// setting the value to true denotes that the server should be closed
 		/// </summary>
@@ -23,7 +29,88 @@ namespace consoleServer
 		/// </summary>
 		static void Main(string[] args)
 		{
-			new Program().RunServer();
+			instance = new Program();
+			Thread t = new Thread(new ThreadStart(instance.RunServer));
+			
+			t.Start();
+
+			Console.WriteLine("The server is listening to your commands...");
+			string input;
+			while (!instance.stop)
+			{
+				input = Console.ReadLine();
+				instance.ProcessStringCommand(input);
+			}
+			Console.WriteLine("The server stopped listening to your commands.");
+		}
+
+		private void ProcessStringCommand(string command)
+		{
+			string[] splitCommand;
+			splitCommand = command.Split(' ');
+			switch (splitCommand[0].ToUpper())
+			{
+				case "STOP":
+					instance.Close();
+					break;
+				case "EXIT":
+					instance.Close();
+					break;
+				case "PRINTALL":
+					instance.PrintAll();
+					break;
+				case "KILLALL":
+					instance.KillEverything();
+					break;
+				default:
+					Console.WriteLine("I did not understand the command: " + splitCommand[0]);
+					break;
+			}
+		}
+
+		private void KillEverything()
+		{
+			try
+			{
+				IQuery query = client.Query();
+				IEnumerable allObjects = query.Execute();
+
+				foreach (Object item in allObjects)
+				{
+
+					GenericObject dbObject = (GenericObject)item; 
+					dbObject.GetGenericClass().GetDeclaredFields();
+					
+					Console.WriteLine("Killing: "+dbObject.Get(0));
+					client.Delete(dbObject);
+				}
+				client.Commit();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
+		}
+
+		private void PrintAll()
+		{
+			try
+			{
+				IQuery query = client.Query();
+				IEnumerable allObjects = query.Execute();
+
+				foreach (Object item in allObjects){
+
+					GenericObject dbObject = (GenericObject)item; // Note: If db4o finds actuall class, it will be the right class, otherwise GenericObject. You may need to do some checks and casts
+					dbObject.GetGenericClass().GetDeclaredFields(); // Find out fields
+					object fieldData = dbObject.Get(0); // Get the field at index 0. The GetDeclaredFields() tells you which field is at which index
+					Console.WriteLine(fieldData.ToString());
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e.Message);
+			}
 		}
 
 		/// <summary>
@@ -40,10 +127,12 @@ namespace consoleServer
 				IConfiguration configuration = Db4oFactory.NewConfiguration();
 				configuration.ClientServer().SetMessageRecipient(this);
 			
-				IObjectServer db4oServer = Db4oFactory.OpenServer(configuration, FileName, Port);
-				db4oServer.GrantAccess(User, Password);
+				server = Db4oFactory.OpenServer(configuration, FileName, Port);
+				server.GrantAccess(User, Password);
+				server.GrantAccess("server", "serverpass");
 
 				Console.WriteLine("Server started");
+				client = Db4oFactory.OpenClient(Host, Port, "server", "serverpass");
 				try
 				{
 					if (!stop){
@@ -56,7 +145,7 @@ namespace consoleServer
 				{
 					Console.WriteLine(e.ToString());
 				}
-				db4oServer.Close();
+				server.Close();
 				Console.WriteLine("Server closed");
 			}
 		}

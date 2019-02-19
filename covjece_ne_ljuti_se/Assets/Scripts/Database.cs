@@ -50,7 +50,8 @@ public class Database{
 
 	public static void RemoveCurrentPlayer(Player currentPlayer)
 	{
-		Client.mConnection.Delete(currentPlayer);
+		Player player = (Player) Client.mConnection.QueryByExample(currentPlayer).Next();
+		Client.mConnection.Delete(player);
 		Client.mConnection.Commit();
 	}
 	

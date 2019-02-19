@@ -1,5 +1,5 @@
-﻿public class Player {
-	
+﻿public class Player
+{
 	public string ScreenName { get; set; }
 
 	public Player()
