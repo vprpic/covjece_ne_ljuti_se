@@ -3,7 +3,6 @@ using Db4objects.Db4o.Messaging;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class Client : MonoBehaviour
 {
@@ -12,6 +11,7 @@ public class Client : MonoBehaviour
 	public static IObjectContainer mConnection;
 	public static Player currentPlayer;
 	private static bool owner = false;
+	private static GameConfiguration gameConfig;
 
 	private void Start()
 	{
@@ -35,10 +35,55 @@ public class Client : MonoBehaviour
 			AddPlayer(username);
 			//PrintAllPlayers();
 			PlayerPrefs.SetString("username", username);
-			SceneManager.LoadScene("Hub");
+		}
+		const int timeOutInMilliSec = 1000;
+		try
+		{
+			mConnection.Ext().SetSemaphore("game_config", timeOutInMilliSec);
+
+			IObjectSet gmcf = mConnection.QueryByExample(new GameConfiguration());
+			if (gmcf.HasNext())
+			{
+				gameConfig = (GameConfiguration)gmcf.Next();
+			}
+			else
+			{
+				gameConfig = new GameConfiguration();
+				mConnection.Store(gameConfig);
+				mConnection.Commit();
+			}
+		}
+		finally
+		{
+			mConnection.Ext().ReleaseSemaphore("game_config");
 		}
 	}
-	
+
+	internal static void RegisterThePlayerAsReady()
+	{
+		mConnection.Ext().Refresh(gameConfig, int.MaxValue);
+		const int timeOutInMilliSec = 1000;
+		try
+		{
+			mConnection.Ext().SetSemaphore("game_config", timeOutInMilliSec);
+
+			if (!gameConfig.ConfirmedPlayers.Contains(currentPlayer))
+			{
+				gameConfig.ConfirmedPlayers.Add(currentPlayer);
+				mConnection.Commit();
+				UnityEngine.Debug.Log("Added player " + currentPlayer.ScreenName + " to the list of ready players.");
+			}
+			else
+			{
+				UnityEngine.Debug.Log("Player " + currentPlayer.ScreenName + " is already on the list of ready players.");
+			}
+		}
+		finally
+		{
+			mConnection.Ext().ReleaseSemaphore("game_config");
+		}
+	}
+
 	public static void SendMessageToServer(string message)
 	{
 		IObjectContainer objectContainer = null;

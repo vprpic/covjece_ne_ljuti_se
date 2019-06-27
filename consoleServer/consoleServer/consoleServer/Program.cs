@@ -10,6 +10,7 @@ using Db4objects.Db4o.Messaging;
 using Db4objects.Db4o.Query;
 using System.Collections;
 using Db4objects.Db4o.Reflect.Generic;
+using Db4objects.Db4o.Reflect;
 
 namespace consoleServer
 {
@@ -39,12 +40,12 @@ namespace consoleServer
 			while (!instance.stop)
 			{
 				input = Console.ReadLine();
-				instance.ProcessStringCommand(input);
+				instance.ProcessCommandLineCommand(input);
 			}
 			Console.WriteLine("The server stopped listening to your commands.");
 		}
 
-		private void ProcessStringCommand(string command)
+		private void ProcessCommandLineCommand(string command)
 		{
 			string[] splitCommand;
 			splitCommand = command.Split(' ');
@@ -70,6 +71,7 @@ namespace consoleServer
 
 		private void KillEverything()
 		{
+			bool empty = true;
 			try
 			{
 				IQuery query = client.Query();
@@ -78,11 +80,14 @@ namespace consoleServer
 				foreach (Object item in allObjects)
 				{
 
-					GenericObject dbObject = (GenericObject)item; 
-					dbObject.GetGenericClass().GetDeclaredFields();
-					
-					Console.WriteLine("Killing: "+dbObject.Get(0));
-					client.Delete(dbObject);
+					GenericObject dbObject = (GenericObject)item;
+					if (dbObject.GetGenericClass().GetName().ToLower().Contains("player"))
+					{
+						IReflectField screenNameField = dbObject.GetGenericClass().GetDeclaredField("<ScreenName>k__BackingField");
+						Console.WriteLine("Killing: "+ screenNameField.Get(dbObject).ToString());
+						client.Delete(dbObject);
+						empty = false;
+					}
 				}
 				client.Commit();
 			}
@@ -90,27 +95,96 @@ namespace consoleServer
 			{
 				Console.WriteLine(e.Message);
 			}
+			if (empty)
+			{
+				Console.WriteLine("The list of players is already empty.");
+			}
 		}
 
 		private void PrintAll()
 		{
+			List<Player> players = GetAllPlayers();
+			foreach(Player p in players)
+			{
+				Console.WriteLine(p.ScreenName);
+			}
+			if(players == null || players.Count == 0)
+			{
+				Console.WriteLine("The list of players is empty.");
+			}
+
+			//bool empty = true;
+			//try
+			//{
+			//	IQuery query = client.Query();
+			//	IEnumerable allObjects = query.Execute();
+
+			//	foreach (Object item in allObjects)
+			//	{
+			//		GenericObject dbObject = (GenericObject)item; // Note: If db4o finds actuall class, it will be the right class, otherwise GenericObject. You may need to do some checks and casts
+			//		dbObject.GetGenericClass().GetDeclaredFields(); // Find out fields
+			//		//Console.WriteLine("Full name of type: " + dbObject.GetGenericClass().GetName());
+			//		//if (dbObject.GetGenericClass().GetName().ToLower().Contains("player"))
+			//		//{
+			//		//	foreach (IReflectField a in dbObject.GetGenericClass().GetDeclaredFields())
+			//		//	{
+			//		//		if (a.GetName().ToString().ToLower().Contains("screenname"))
+			//		//		{
+			//		//			Console.WriteLine("name: " + a.Get(item).ToString());
+			//		//			empty = false;
+			//		//		}
+			//		//	}
+			//		//}
+			//		//object fieldData = dbObject.Get(0); // Get the field at index 0. The GetDeclaredFields() tells you which field is at which index
+			//		//Console.WriteLine(fieldData.ToString());
+			//	}
+			//}
+			//catch (Exception e)
+			//{
+			//	Console.WriteLine(e.Message);
+			//}
+			//if (empty)
+			//{
+			//	Console.WriteLine("The list is empty.");
+			//}
+		}
+
+		public List<Player> GetAllPlayers()
+		{
+			List<Player> players = new List<Player>();
 			try
 			{
 				IQuery query = client.Query();
 				IEnumerable allObjects = query.Execute();
 
-				foreach (Object item in allObjects){
-
-					GenericObject dbObject = (GenericObject)item; // Note: If db4o finds actuall class, it will be the right class, otherwise GenericObject. You may need to do some checks and casts
-					dbObject.GetGenericClass().GetDeclaredFields(); // Find out fields
-					object fieldData = dbObject.Get(0); // Get the field at index 0. The GetDeclaredFields() tells you which field is at which index
-					Console.WriteLine(fieldData.ToString());
+				foreach (Object item in allObjects)
+				{
+					GenericObject dbObject = (GenericObject)item;
+					if (dbObject.GetGenericClass().GetName().ToLower().Contains("player"))
+					{
+						IReflectField screenNameField = dbObject.GetGenericClass().GetDeclaredField("<ScreenName>k__BackingField");
+						players.Add(new Player(screenNameField.Get(dbObject).ToString()));
+					}
 				}
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e.Message);
 			}
+			return players;
+		}
+
+		public bool VerifyPlayer(string screenName)
+		{
+			foreach(Player p in GetAllPlayers())
+			{
+				if (p.ScreenName.Equals(screenName))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -161,7 +235,7 @@ namespace consoleServer
 			{
 				if (message is string)
 				{
-					string[] splitMessage = message.ToString().Split(';');
+					string[] splitMessage = message.ToString().Split(' ');
 					switch (splitMessage[0])
 					{
 						case "STOP":
@@ -190,12 +264,13 @@ namespace consoleServer
 				}
 			}
 		}
-	// end ProcessMessage
-	
-	    /// <summary>
-	    /// closes this server.
-	    /// </summary>
-	    public void Close()
+		
+		// end ProcessMessage
+
+		/// <summary>
+		/// closes this server.
+		/// </summary>
+		public void Close()
 	    {
 	        lock(this)
 	        {

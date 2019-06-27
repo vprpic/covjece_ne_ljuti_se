@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Diagnostics;
+using UnityEngine.SceneManagement;
 
 public class LobbyScene : MonoBehaviour {
 	private InputField usernameInput;
@@ -27,6 +28,7 @@ public class LobbyScene : MonoBehaviour {
 		//Client.AddPlayer(Random.Range(0,1000), username);
 		//Client.DisconnectFromServer();
 		//Debug.Log("Disconnected from server");
+		SceneManager.LoadScene("Hub");
 	}
 
 	public void StartConsoleServer()

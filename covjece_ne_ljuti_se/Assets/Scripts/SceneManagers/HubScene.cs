@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class HubScene : MonoBehaviour {
@@ -29,5 +30,30 @@ public class HubScene : MonoBehaviour {
 
 		}
 	}
+
+	private void StartTheGame()
+	{
+		SceneManager.LoadScene("Hub");
+	}
+
+	private void PlayerIsReady()
+	{
+		Client.RegisterThePlayerAsReady();
+
+		//TODO: disable option to configure the player color and options
+
+
+		//check if all players are ready if yes start game else wait
+		//if (CheckIfPlayersReady())
+		//{
+		//	StartTheGame();
+		//}
+		//else
+		//{
+		//	Debug.Log("Not all players are ready to play, waiting for players.");
+		//}
+	}
+
+
 	
 }

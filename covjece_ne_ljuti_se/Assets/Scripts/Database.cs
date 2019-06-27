@@ -54,7 +54,7 @@ public class Database{
 		Client.mConnection.Delete(player);
 		Client.mConnection.Commit();
 	}
-	
+
 	public static List<Player> FetchAllPlayers()
 	{
 		List<Player> players = new List<Player>();
