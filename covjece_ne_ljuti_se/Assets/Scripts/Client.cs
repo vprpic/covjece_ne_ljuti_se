@@ -130,6 +130,11 @@ public class Client : MonoBehaviour
 		Database.AddPlayer(new Player(screenName));
 	}
 
+	public static void RemoveCurrentPlayer()
+	{
+		Database.RemoveCurrentPlayer(currentPlayer);
+	}
+
 	public static void PrintAllPlayers()
 	{
 		foreach (Player player in Database.FetchAllPlayers())

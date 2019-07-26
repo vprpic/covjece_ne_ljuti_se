@@ -54,6 +54,14 @@ public class HubScene : MonoBehaviour {
 		//}
 	}
 
+	public void DisonnectFromServer()
+	{
+		Client.RemoveCurrentPlayer();
+		UnityEngine.Debug.Log("Connected to server");
+		Debug.Log("Disconnected player "+Client.currentPlayer.ScreenName+" from server");
+		SceneManager.LoadScene("Lobby");
+	}
 
-	
+
+
 }
