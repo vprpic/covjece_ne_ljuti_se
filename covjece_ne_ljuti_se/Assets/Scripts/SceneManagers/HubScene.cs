@@ -36,7 +36,7 @@ public class HubScene : MonoBehaviour {
 		SceneManager.LoadScene("Hub");
 	}
 
-	private void PlayerIsReady()
+	public void PlayerIsReady()
 	{
 		Client.RegisterThePlayerAsReady();
 

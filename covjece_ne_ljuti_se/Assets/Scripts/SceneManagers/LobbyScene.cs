@@ -4,10 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Diagnostics;
 using UnityEngine.SceneManagement;
+using System;
 
 public class LobbyScene : MonoBehaviour {
 	private InputField usernameInput;
 	private string mUsername;
+	public GameObject error;
+	public Text errorText;
 
 	// Use this for initialization
 	void Start () {
@@ -21,7 +24,7 @@ public class LobbyScene : MonoBehaviour {
 
 	public void ConnectToServer()
 	{
-		Random.InitState(22);
+		//UnityEngine.Random.InitState(22);
 		mUsername = usernameInput.text.ToString();
 		Client.ConnectToServer(mUsername);
 		UnityEngine.Debug.Log("Connected to server");
@@ -33,7 +36,9 @@ public class LobbyScene : MonoBehaviour {
 
 	public void StartConsoleServer()
 	{
-		var stringPath = Application.dataPath + "/consoleServer/consoleServer.exe";
+		SetErrorText("Started console server.");
+		//var stringPath = Application.dataPath + @"/consoleServer/consoleServer.exe";
+		var stringPath = Environment.CurrentDirectory + @"\consoleServer\consoleServer.exe";
 		UnityEngine.Debug.Log(stringPath);
 		//var myProcess = new Process();
 		Process.Start(stringPath);
@@ -55,4 +60,9 @@ public class LobbyScene : MonoBehaviour {
 		Client.PrintAllPlayers();
 	}
 	
+	private void SetErrorText(string errorString, bool visible = true)
+	{
+		error.SetActive(visible);
+		errorText.text = errorString;
+	}
 }
