@@ -32,7 +32,7 @@ public class Client : MonoBehaviour
 		else
 		{
 			currentPlayer = new Player(username);
-			AddPlayer(username);
+			AddPlayer(currentPlayer);
 			//PrintAllPlayers();
 			PlayerPrefs.SetString("username", username);
 		}
@@ -61,27 +61,10 @@ public class Client : MonoBehaviour
 
 	internal static void RegisterThePlayerAsReady()
 	{
-		mConnection.Ext().Refresh(gameConfig, int.MaxValue);
-		const int timeOutInMilliSec = 1000;
-		try
-		{
-			mConnection.Ext().SetSemaphore("game_config", timeOutInMilliSec);
-
-			if (!gameConfig.ConfirmedPlayers.Contains(currentPlayer))
-			{
-				gameConfig.ConfirmedPlayers.Add(currentPlayer);
-				mConnection.Commit();
-				UnityEngine.Debug.Log("Added player " + currentPlayer.ScreenName + " to the list of ready players.");
-			}
-			else
-			{
-				UnityEngine.Debug.Log("Player " + currentPlayer.ScreenName + " is already on the list of ready players.");
-			}
-		}
-		finally
-		{
-			mConnection.Ext().ReleaseSemaphore("game_config");
-		}
+		currentPlayer.Ready = true;
+		mConnection.Store(currentPlayer);
+		mConnection.Commit();
+		UnityEngine.Debug.Log("Set player " + currentPlayer.ScreenName + " as ready.");
 	}
 
 	public static void SendMessageToServer(string message)
@@ -115,6 +98,7 @@ public class Client : MonoBehaviour
 	{
 		if (mConnection != null)
 		{
+			//Database.
 			Database.RemoveCurrentPlayer(currentPlayer);
 			mConnection.Close();
 		}
@@ -125,14 +109,17 @@ public class Client : MonoBehaviour
 		SendMessageToServer("STOP");
 	}
 
-	public static void AddPlayer(string screenName)
+	public static void AddPlayer(Player player)
 	{
-		Database.AddPlayer(new Player(screenName));
+		Database.AddPlayer(player);
 	}
 
 	public static void RemoveCurrentPlayer()
 	{
+		if (currentPlayer == null)
+			return;
 		Database.RemoveCurrentPlayer(currentPlayer);
+		currentPlayer = null;
 	}
 
 	public static void PrintAllPlayers()

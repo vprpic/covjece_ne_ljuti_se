@@ -969,7 +969,7 @@ MonoBehaviour:
   PlayerListContent: {fileID: 546797384}
   PlayerListNamePrefab: {fileID: 1601432892772828, guid: 1e6681a33c28f00459e20a6d8d915cda,
     type: 2}
-  ReadyPlayButtonText: {fileID: 1644764304}
+  ReadyPlayButtonText: {fileID: 0}
 --- !u!1 &1637860572
 GameObject:
   m_ObjectHideFlags: 0
@@ -1107,7 +1107,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Ready
+  m_Text: Game Scene
 --- !u!222 &1644764305
 CanvasRenderer:
   m_ObjectHideFlags: 0

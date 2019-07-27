@@ -60,10 +60,12 @@ public class Database{
 		List<Player> players = new List<Player>();
 
 		IObjectSet result = Client.mConnection.QueryByExample(new Player());
-
+		const int activationDeph = 4;
 		while (result.HasNext())
 		{
-			players.Add((Player) result.Next());
+			Player p = (Player) result.Next();
+			Client.mConnection.Ext().Refresh(p, activationDeph);
+			players.Add(p);
 		}
 
 		return players;

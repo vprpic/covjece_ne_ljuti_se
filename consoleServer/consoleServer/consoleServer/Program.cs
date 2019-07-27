@@ -79,7 +79,6 @@ namespace consoleServer
 
 				foreach (Object item in allObjects)
 				{
-
 					GenericObject dbObject = (GenericObject)item;
 					if (dbObject.GetGenericClass().GetName().ToLower().Contains("player"))
 					{
