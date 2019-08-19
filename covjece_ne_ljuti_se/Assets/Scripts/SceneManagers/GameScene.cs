@@ -18,6 +18,7 @@ public class GameScene : MonoBehaviour {
 	private List<GameObject> playerGOs;
 	public Text ReadyPlayButtonText;
 	public GameObject WaypointsGO;
+	public Die die;
 
 	void Start()
 	{
@@ -43,6 +44,12 @@ public class GameScene : MonoBehaviour {
 		InvokeRepeating("UpdateOnlinePlayersList", 0.2f, 1.5f);
 	}
 
+	public void RollTheDie()
+	{
+		//TODO: set roll and do the rest
+		int currRoll = die.Roll();
+	}
+
 	private void ConnectWaypoints()
 	{
 		int children = WaypointsGO.transform.childCount;
@@ -64,9 +71,9 @@ public class GameScene : MonoBehaviour {
 				next = WaypointsGO.transform.GetChild(0).GetComponent<Waypoint>();
 			}
 			//print("For loop " + i + ":  "+ WaypointsGO.transform.GetChild(i).name);
-			print("prev " + prev.transform.name);
-			print("curr " + curr.transform.name);
-			print("next " + next.transform.name);
+			//print("prev " + prev.transform.name);
+			//print("curr " + curr.transform.name);
+			//print("next " + next.transform.name);
 		}
 		curr.prev = prev;
 		curr.next = next;

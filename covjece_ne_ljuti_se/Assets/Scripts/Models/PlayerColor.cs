@@ -8,7 +8,6 @@ public class PlayerColor : MonoBehaviour{
 	public HomePoint firstPoint;
 	public List<Pawn> pawns;
 
-
 	public void SetPawnsForStart()
 	{
 		if (firstPoint == null)
