@@ -19,9 +19,9 @@ public class HubScene : MonoBehaviour {
 		if (Client.mConnection == null)
 			Client.ConnectToServer("Hub");
 		List<Player> players = Database.FetchAllPlayers();
-		foreach(Player player in players)
+		foreach (Player player in players)
 		{
-			Debug.Log("Hub: "+player.ScreenName);
+			Debug.Log("Hub: " + player.ScreenName);
 		}
 		UpdateOnlinePlayersList();
 		InvokeRepeating("UpdateOnlinePlayersList", 0.2f, 1.5f);

@@ -2,6 +2,7 @@
 	
 	public string ScreenName { get; set; }
 	public bool Ready { get; set; }
+	public PlayerColor playerColor { get; set; }
 
 	public Player()
 	{
@@ -24,4 +25,5 @@
 	{
 		return this.ScreenName;
 	}
+
 }
