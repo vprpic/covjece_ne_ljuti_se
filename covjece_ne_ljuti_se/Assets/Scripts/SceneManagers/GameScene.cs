@@ -38,8 +38,38 @@ public class GameScene : MonoBehaviour {
 		{
 			pc.SetPawnsForStart();
 		}
+		ConnectWaypoints();
 		UpdateOnlinePlayersList();
 		InvokeRepeating("UpdateOnlinePlayersList", 0.2f, 1.5f);
+	}
+
+	private void ConnectWaypoints()
+	{
+		int children = WaypointsGO.transform.childCount;
+		Waypoint prev,curr,next;
+		prev = WaypointsGO.transform.GetChild(children - 1).GetComponent<Waypoint>();
+		curr = WaypointsGO.transform.GetChild(0).GetComponent<Waypoint>();
+		next = WaypointsGO.transform.GetChild(1).GetComponent<Waypoint>();
+		for (int i = 2; i <= children; i++)
+		{
+			curr.prev = prev;
+			curr.next = next;
+
+			prev = curr;
+			curr = next;
+			if(i <children)
+				next = WaypointsGO.transform.GetChild(i).GetComponent<Waypoint>();
+			else
+			{
+				next = WaypointsGO.transform.GetChild(0).GetComponent<Waypoint>();
+			}
+			//print("For loop " + i + ":  "+ WaypointsGO.transform.GetChild(i).name);
+			print("prev " + prev.transform.name);
+			print("curr " + curr.transform.name);
+			print("next " + next.transform.name);
+		}
+		curr.prev = prev;
+		curr.next = next;
 	}
 
 	private void UpdateOnlinePlayersList()
