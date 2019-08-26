@@ -45,7 +45,7 @@ public class Database{
 			}
 			data.currentPosId = pdata.currentPosId;
 			data.ownerId = pdata.ownerId;
-			Client.mConnection.Ext().Store(pdata, int.MaxValue);
+			Client.mConnection.Ext().Store(data, int.MaxValue);
 			Client.mConnection.Commit();
 		}
 		finally

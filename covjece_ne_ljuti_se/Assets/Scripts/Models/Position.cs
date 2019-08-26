@@ -8,7 +8,8 @@ public class Position : MonoBehaviour {
 	public Position prev;
 	public Position next;
 	public Pawn occupied;
-	public Player player; //if null no player owns this
+	[SerializeField]
+	public PlayerColor playerColor; //if null no playerColor owns this
 	public int id;
 
 }

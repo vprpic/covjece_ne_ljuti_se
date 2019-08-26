@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 222163863707645200}
   - component: {fileID: 114132960722744590}
   - component: {fileID: 114132953414350308}
+  - component: {fileID: 58332210458554158}
   m_Layer: 5
   m_Name: Pawn
   m_TagString: Untagged
@@ -29,6 +30,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!58 &58332210458554158
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1821274744992728}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 30
 --- !u!114 &114132953414350308
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -41,7 +57,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   go: {fileID: 1821274744992728}
+  owner: {fileID: 0}
   currentPos: {fileID: 0}
+  data:
+    id: 3
+    ownerId: 1
+    currentPosId: -3
 --- !u!114 &114132960722744590
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -90,6 +111,6 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -407, y: 321}
+  m_AnchoredPosition: {x: -235, y: 322}
   m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}

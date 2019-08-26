@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class PlayerColor : MonoBehaviour{
 	
 	public Color color;
@@ -9,6 +10,7 @@ public class PlayerColor : MonoBehaviour{
 	public Waypoint firstPoint;
 	public int id;
 	public List<Pawn> pawns;
+	public List<FinishPoint> finishPoints;
 
 	public void SetPawnsForStart()
 	{

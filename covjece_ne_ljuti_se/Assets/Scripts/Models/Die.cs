@@ -39,4 +39,11 @@ public class Die : MonoBehaviour {
 	{
 		rolledThisTurn = false;
 	}
+
+	internal void RollSix()
+	{
+		current = 6;
+		ChangeImage(current);
+		rolledThisTurn = true;
+	}
 }

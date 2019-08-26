@@ -13,7 +13,7 @@ public class GameScene : MonoBehaviour {
 	public static GameScene instance;
 	public List<Player> Players { get; set; }
 	public List<PlayerColor> playerColors;
-	public PlayerColor currentPlayer;
+	private PlayerColor currentPlayer;
 	//all the pieces on the board
 	public List<Pawn> Pawns;
 	public GameObject PlayerListContent;
@@ -43,40 +43,24 @@ public class GameScene : MonoBehaviour {
 		{
 			UnityEngine.Debug.LogError("GameScene Start() - gameConfig == null");
 		}
-		else if (Client.currentPlayer.ScreenName == playerName)//Client.currentPlayer.Order == 0)
+		else if (Client.currentPlayer.ScreenName == playerName)
 		{
 			gameConfig.NumOfPlayers = players.Count;
 			gameConfig.IsRunning = true;
 			gameConfig.CurrentTurn = 1;
 			Database.UpdateGameConfig(gameConfig);
-
-			//int playerColorPos = 0;
-			//foreach (Player player in players)
-			//{
-			//	UnityEngine.Debug.Log("GameScene: " + player.ToString());
-			//	playerColors[playerColorPos].player = player;
-			//	player.playerColor = playerColors[playerColorPos].id;
-			//	//player.SetColor(playerColors[playerColorPos]);
-			//	playerColorPos++;
-			//	//Database.AddPlayer(player);
-			//	Database.Commit();
-			//}
 		}
 
 		//TEST
 		GameConfiguration gcc = Database.FetchGameConfig();
-		print("num of players: "+gcc.NumOfPlayers + ", current turn: " +gcc.CurrentTurn);
+		print("num of players: " + gcc.NumOfPlayers + ", current turn: " + gcc.CurrentTurn);
 
-		
-		
+		currentPlayer = playerColors.Find(x => x.id == Client.currentPlayer.Order);
+
 		if (Client.currentPlayer.ScreenName == playerName)
 		{
 			foreach (PlayerColor pc in playerColors)
 			{
-				if(pc.id == Client.currentPlayer.Order)
-				{
-					currentPlayer = pc;
-				}
 				pc.SetPawnsForStart();
 			}
 			UpdateAllPawnData();
@@ -84,8 +68,8 @@ public class GameScene : MonoBehaviour {
 		ConnectWaypoints();
 		UpdateOnlinePlayersList();
 		InvokeRepeating("UpdateOnlinePlayersList", 0.2f, 1.5f);
-		InvokeRepeating("UpdateGameConfig", 0.2f, 1.4f);
-		InvokeRepeating("UpdatePawnPosition", 0.2f, 2f);
+		InvokeRepeating("UpdateLocalGameConfig", 0.2f, 1.4f);
+		InvokeRepeating("UpdateLocalPawnPosition", 0.2f, 2f);
 	}
 
 	private void UpdateAllPawnData()
@@ -118,7 +102,14 @@ public class GameScene : MonoBehaviour {
 	public void RollTheDie()
 	{
 		//TODO: set roll and do the rest
-		int currRoll = die.Roll();
+		if(gameConfig.CurrentTurn < 10)
+		{
+			die.RollSix();
+		}
+		else
+		{
+			die.Roll();
+		}
 		die.button.SetActive(false);
 		MakeMoveAvailable();
 	}
@@ -127,25 +118,32 @@ public class GameScene : MonoBehaviour {
 	private void MakeMoveAvailable()
 	{
 		//TODO: visual reference - show possible moves
-		//foreach(Pawn p in currentPlayer.pawns)
-		//{
-
-		//}
 		print("MakeMoveAvailable");
-		currentPlayer.pawns[0].Move(currentPlayer.firstPoint);
-		Database.UpdatePawnData(currentPlayer.pawns[0].data);
-		if (die.current == 6 || die.current == 5 || die.current == 4)
+		die.rolledThisTurn = true;
+		//TODO: if no possible turns go to the next turn
+		bool possibleMove = false;
+		foreach(Pawn p in currentPlayer.pawns)
 		{
-			currentPlayer.pawns[1].Move(currentPlayer.firstPoint.next);
-			Database.UpdatePawnData(currentPlayer.pawns[1].data);
+			Position tempPosition;
+			tempPosition = p.CalculateMove(p.currentPos, die.current);
+			if (p.MovePossible(tempPosition))
+			{
+				possibleMove = true;
+			}
+		}
+		if (!possibleMove)
+		{
+			NextTurn();
 		}
 	}
 
 	public void NextTurn()
 	{
+		die.rolledThisTurn = false;
 		gameConfig.CurrentTurn++;
 		MakeUnplayable();
 		Database.UpdateGameConfig(gameConfig);
+		//UpdateLocalGameConfig();
 	}
 
 	private void ConnectWaypoints()
@@ -183,9 +181,10 @@ public class GameScene : MonoBehaviour {
 	{
 		GameConfiguration gc = Database.FetchGameConfig();
 		gameConfig = gc;
-		UpdatePawnPosition();
+		UpdateLocalPawnPosition();
 		print("GameScene UpdateGameConfig - "+Client.currentPlayer.Order +" "+gc.CurrentTurn);
-		if(gameConfig.CurrentTurn % gameConfig.NumOfPlayers
+		if( gameConfig.NumOfPlayers > 1 &&
+			gameConfig.CurrentTurn % gameConfig.NumOfPlayers
 			== Client.currentPlayer.Order % gameConfig.NumOfPlayers)
 		{
 			MakePlayable();
@@ -196,7 +195,7 @@ public class GameScene : MonoBehaviour {
 		}
 	}
 
-	private void UpdatePawnPosition()
+	private void UpdateLocalPawnPosition()
 	{
 		List<PawnData> pawnDatas = Database.FetchAllPawnDatas();
 		if(pawnDatas == null)
@@ -207,13 +206,13 @@ public class GameScene : MonoBehaviour {
 		MapPawnData(pawnDatas);
 	}
 
-	private void MapPawnData(List<PawnData> pawnDatas)
+	private void MapPawnData(List<PawnData> pawnDatasDB)
 	{
-		foreach(PawnData pd in pawnDatas)
+		foreach(PawnData pd in pawnDatasDB)
 		{
 			Pawn pawn = Pawns.Find(x => x.data.id == pd.id && x.data.ownerId == pd.ownerId);
-			if (pawn.data.currentPosId == pd.currentPosId)
-				return;
+			if (pawn.data.currentPosId == pd.currentPosId && pawn.currentPos.id == pd.currentPosId)
+				continue;
 			pawn.data.currentPosId = pd.currentPosId;
 			pawn.Move(FindPosition(pd.currentPosId));
 		}
@@ -221,19 +220,25 @@ public class GameScene : MonoBehaviour {
 
 	private Position FindPosition(int currentPosId)
 	{
-		//home positions are < 0
-		if(currentPosId < 0)
+		//home positions are from -4 to -1
+		if (currentPosId < 0 && currentPosId > -5)
 		{
 			HomePoint hp = currentPlayer.firstHomePoint;
-			while (hp != null) {
-				if(hp.id == currentPosId)
+			while (hp != null)
+			{
+				if (hp.id == currentPosId)
 				{
 					return hp;
 				}
-				hp = (HomePoint) hp.next;
+				hp = (HomePoint)hp.next;
 			}
 			UnityEngine.Debug.LogError("GameScene findPosition - Couldn't find home position from id");
 			return currentPlayer.firstHomePoint;
+		}
+		//finish positions are from -8 to -5
+		else if (currentPosId < -4)
+		{
+			return currentPlayer.finishPoints.Find(x=>x.id == currentPosId);
 		}
 		return allWaypoints.Find(x => x.id == currentPosId);
 	}
