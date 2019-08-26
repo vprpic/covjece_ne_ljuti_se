@@ -1,5 +1,6 @@
 ﻿using Db4objects.Db4o;
 using Db4objects.Db4o.Messaging;
+using Db4objects.Db4o.TA;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,12 +11,21 @@ public class Client : MonoBehaviour
 	//public static Database db { get; set; }
 	public static IObjectContainer mConnection;
 	public static Player currentPlayer;
-	private static bool owner = false;
+	//private static bool owner = false;
 	private static GameConfiguration gameConfig;
 
 	private void Start()
 	{
 		DontDestroyOnLoad(this);
+		Db4oFactory.Configure().Add(new TransparentActivationSupport());
+		Db4oFactory.Configure().Add(new TransparentPersistenceSupport());
+		Db4oFactory.Configure().ObjectClass(typeof(Player)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(Pawn)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(Position)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(FinishPoint)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(HomePoint)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(PlayerColor)).CascadeOnUpdate(true);
+		Db4oFactory.Configure().ObjectClass(typeof(GameConfiguration)).CascadeOnUpdate(true);
 	}
 
 	public static void ConnectToServer(string username)
@@ -31,7 +41,7 @@ public class Client : MonoBehaviour
 		}
 		else
 		{
-			currentPlayer = new Player(username);
+			currentPlayer = new Player(username, playerId);
 			AddPlayer(currentPlayer);
 			//PrintAllPlayers();
 			PlayerPrefs.SetString("username", username);

@@ -11,6 +11,7 @@ using Db4objects.Db4o.Query;
 using System.Collections;
 using Db4objects.Db4o.Reflect.Generic;
 using Db4objects.Db4o.Reflect;
+using Db4objects.Db4o.TA;
 
 namespace consoleServer
 {
@@ -199,7 +200,12 @@ namespace consoleServer
 				// messages to this.processMessage
 				IConfiguration configuration = Db4oFactory.NewConfiguration();
 				configuration.ClientServer().SetMessageRecipient(this);
-			
+
+
+				configuration.Add(new TransparentActivationSupport());
+				configuration.Add(new TransparentPersistenceSupport());
+
+				
 				server = Db4oFactory.OpenServer(configuration, FileName, Port);
 				server.GrantAccess(User, Password);
 				server.GrantAccess("server", "serverpass");

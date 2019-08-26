@@ -9,5 +9,6 @@ public class Position : MonoBehaviour {
 	public Position next;
 	public Pawn occupied;
 	public Player player; //if null no player owns this
+	public int id;
 
 }

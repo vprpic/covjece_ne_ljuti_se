@@ -24,6 +24,19 @@ public class HubScene : MonoBehaviour {
 			Debug.Log("Hub: " + player.ScreenName);
 		}
 		UpdateOnlinePlayersList();
+		//if (Client.currentPlayer.ScreenName == "mon")//Client.currentPlayer.Order == 0)
+		//{
+		//	int playerColorPos = 0;
+		//	foreach (Player player in players)
+		//	{
+		//		UnityEngine.Debug.Log("GameScene: " + player.ToString());
+		//		playerColors[playerColorPos].player = player;
+		//		player.playerColor = playerColors[playerColorPos];
+		//		//player.SetColor(playerColors[playerColorPos]);
+		//		playerColorPos++;
+		//		Database.AddPlayer(player);
+		//	}
+		//}
 		InvokeRepeating("UpdateOnlinePlayersList", 0.2f, 1.5f);
 	}
 
