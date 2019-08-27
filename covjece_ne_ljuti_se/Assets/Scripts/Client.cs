@@ -36,7 +36,6 @@ public class Client : MonoBehaviour
 		mConnection = connection;
 		if (playerId <= -1)
 		{
-			//TODO: error while connecting, show UI error
 			UnityEngine.Debug.Log("Error while connecting");
 		}
 		else

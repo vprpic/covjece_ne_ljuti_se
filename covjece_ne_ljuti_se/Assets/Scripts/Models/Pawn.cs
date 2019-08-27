@@ -34,7 +34,6 @@ public class Pawn : MonoBehaviour {
 			SendPawnHome(position.occupied);
 			//Database.UpdatePawnData(position.occupied.data);
 		}
-		//TODO: animation
 		currentPos.occupied = null;
 		go.transform.position = position.transform.position;
 		currentPos = position;

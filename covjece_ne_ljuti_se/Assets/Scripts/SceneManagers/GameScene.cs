@@ -87,7 +87,6 @@ public class GameScene : MonoBehaviour {
 			return;
 		playable = true;
 		die.button.SetActive(true);
-		//TODO:
 	}
 
 	public void MakeUnplayable()
@@ -97,20 +96,11 @@ public class GameScene : MonoBehaviour {
 
 		playable = false;
 		die.button.SetActive(false);
-		//TODO: 
 	}
 
 	public void RollTheDie()
 	{
-		//TODO: set roll and do the rest
-		if(gameConfig.CurrentTurn < 10)
-		{
-			die.RollSix();
-		}
-		else
-		{
-			die.Roll();
-		}
+		die.Roll();
 		die.button.SetActive(false);
 		MakeMoveAvailable();
 	}
@@ -121,7 +111,6 @@ public class GameScene : MonoBehaviour {
 		//TODO: visual reference - show possible moves
 		print("MakeMoveAvailable");
 		die.rolledThisTurn = true;
-		//TODO: if no possible turns go to the next turn
 		bool possibleMove = false;
 		foreach(Pawn p in currentPlayer.pawns)
 		{
@@ -148,7 +137,6 @@ public class GameScene : MonoBehaviour {
 			gameConfig.IsRunning = false;
 		}
 		Database.UpdateGameConfig(gameConfig);
-		//UpdateLocalGameConfig();
 	}
 
 	private void ConnectWaypoints()
@@ -237,7 +225,7 @@ public class GameScene : MonoBehaviour {
 		//home positions are from -4 to -1
 		if (pawn.data.currentPosId < 0 && pawn.data.currentPosId > -5)
 		{
-			HomePoint hp = currentPlayer.firstHomePoint;
+			HomePoint hp = pawn.owner.firstHomePoint;
 			while (hp != null)
 			{
 				if (hp.id == pawn.data.currentPosId)
@@ -247,7 +235,7 @@ public class GameScene : MonoBehaviour {
 				hp = (HomePoint)hp.next;
 			}
 			UnityEngine.Debug.LogError("GameScene findPosition - Couldn't find home position from id");
-			return currentPlayer.firstHomePoint;
+			return pawn.owner.firstHomePoint;
 		}
 		//finish positions are from -8 to -5
 		else if (pawn.data.currentPosId < -4)
@@ -266,20 +254,6 @@ public class GameScene : MonoBehaviour {
 			//TODO: recycle GOs
 			Destroy(playerGOs[i]);
 		}
-		//if (Client.currentPlayer.ScreenName == "mon")//Client.currentPlayer.Order == 0)
-		//{
-		//	int playerColorPos = 0;
-		//	foreach (Player player in players)
-		//	{
-		//		UnityEngine.Debug.Log("GameScene: " + player.ToString());
-		//		playerColors[playerColorPos].player = player;
-		//		player.playerColor = playerColors[playerColorPos].id;
-		//		//player.SetColor(playerColors[playerColorPos]);
-		//		playerColorPos++;
-		//		Database.AddPlayer(player);
-		//		Database.Commit();
-		//	}
-		//}
 		foreach (Player player in players)
 		{
 			currentListedPlayers.Add(player);

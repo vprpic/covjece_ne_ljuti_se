@@ -72,8 +72,6 @@ public class HubScene : MonoBehaviour {
 	{
 		Client.RegisterThePlayerAsReady();
 
-		//TODO: disable option to configure the player color and options
-
 		//check if all players are ready if yes start game else wait
 		StartTheGame();
 	}
