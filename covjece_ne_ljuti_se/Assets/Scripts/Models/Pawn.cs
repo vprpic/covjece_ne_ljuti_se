@@ -92,8 +92,15 @@ public class Pawn : MonoBehaviour {
 			return;
 
 		Database.UpdatePawnData(this.data);
-
-		GameScene.instance.NextTurn();
+		bool gameOver = true;
+		foreach(FinishPoint fp in owner.finishPoints)
+		{
+			if(fp.occupied == null)
+			{
+				gameOver = false;
+			}
+		}
+		GameScene.instance.NextTurn(gameOver);
 	}
 
 	//returns null if move impossible
@@ -128,6 +135,7 @@ public class Pawn : MonoBehaviour {
 					if (tempPos is Waypoint && tempPos.playerColor != null && tempPos.playerColor.id == this.owner.id && ((Waypoint)tempPos).finishPoint != null)
 					{
 						tempPos = ((Waypoint)tempPos).finishPoint;
+						continue;
 					}
 					else
 					{
@@ -138,10 +146,12 @@ public class Pawn : MonoBehaviour {
 				if(tempPos is Waypoint && tempPos.playerColor != null && tempPos.playerColor.id == this.owner.id && ((Waypoint)tempPos).finishPoint != null)
 				{
 					tempPos = ((Waypoint)tempPos).finishPoint;
+					continue;
 				}
 				else
 				{
 					tempPos = tempPos.next;
+					continue;
 				}
 			}
 			return tempPos;

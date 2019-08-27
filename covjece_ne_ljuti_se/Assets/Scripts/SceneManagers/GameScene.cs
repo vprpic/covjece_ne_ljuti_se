@@ -16,6 +16,7 @@ public class GameScene : MonoBehaviour {
 	private PlayerColor currentPlayer;
 	//all the pieces on the board
 	public List<Pawn> Pawns;
+	public GameObject gameOverGO;
 	public GameObject PlayerListContent;
 	public GameObject PlayerListNamePrefab;
 	private List<Player> currentListedPlayers;
@@ -137,11 +138,15 @@ public class GameScene : MonoBehaviour {
 		}
 	}
 
-	public void NextTurn()
+	public void NextTurn(bool gameOver = false)
 	{
 		die.rolledThisTurn = false;
 		gameConfig.CurrentTurn++;
 		MakeUnplayable();
+		if (gameOver)
+		{
+			gameConfig.IsRunning = false;
+		}
 		Database.UpdateGameConfig(gameConfig);
 		//UpdateLocalGameConfig();
 	}
@@ -183,7 +188,8 @@ public class GameScene : MonoBehaviour {
 		gameConfig = gc;
 		UpdateLocalPawnPosition();
 		print("GameScene UpdateGameConfig - "+Client.currentPlayer.Order +" "+gc.CurrentTurn);
-		if( gameConfig.NumOfPlayers > 1 &&
+		if( gc.IsRunning &&
+			gameConfig.NumOfPlayers > 1 &&
 			gameConfig.CurrentTurn % gameConfig.NumOfPlayers
 			== Client.currentPlayer.Order % gameConfig.NumOfPlayers)
 		{
@@ -192,6 +198,14 @@ public class GameScene : MonoBehaviour {
 		else
 		{
 			MakeUnplayable();
+		}
+		if (!gc.IsRunning)
+		{
+			gameOverGO.SetActive(true);
+		}
+		else
+		{
+			gameOverGO.SetActive(false);
 		}
 	}
 
