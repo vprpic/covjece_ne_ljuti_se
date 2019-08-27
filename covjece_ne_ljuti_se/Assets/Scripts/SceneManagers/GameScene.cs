@@ -214,19 +214,19 @@ public class GameScene : MonoBehaviour {
 			if (pawn.data.currentPosId == pd.currentPosId && pawn.currentPos.id == pd.currentPosId)
 				continue;
 			pawn.data.currentPosId = pd.currentPosId;
-			pawn.Move(FindPosition(pd.currentPosId));
+			pawn.Move(FindPosition(pawn));
 		}
 	}
 
-	private Position FindPosition(int currentPosId)
+	private Position FindPosition(Pawn pawn)
 	{
 		//home positions are from -4 to -1
-		if (currentPosId < 0 && currentPosId > -5)
+		if (pawn.data.currentPosId < 0 && pawn.data.currentPosId > -5)
 		{
 			HomePoint hp = currentPlayer.firstHomePoint;
 			while (hp != null)
 			{
-				if (hp.id == currentPosId)
+				if (hp.id == pawn.data.currentPosId)
 				{
 					return hp;
 				}
@@ -236,11 +236,11 @@ public class GameScene : MonoBehaviour {
 			return currentPlayer.firstHomePoint;
 		}
 		//finish positions are from -8 to -5
-		else if (currentPosId < -4)
+		else if (pawn.data.currentPosId < -4)
 		{
-			return currentPlayer.finishPoints.Find(x=>x.id == currentPosId);
+			return pawn.owner.finishPoints.Find(x=>x.id == pawn.data.currentPosId);
 		}
-		return allWaypoints.Find(x => x.id == currentPosId);
+		return allWaypoints.Find(x => x.id == pawn.data.currentPosId);
 	}
 
 	private void UpdateOnlinePlayersList()
