@@ -32,6 +32,7 @@ public class Pawn : MonoBehaviour {
 			}
 			//position is occupied by other color
 			SendPawnHome(position.occupied);
+			//Database.UpdatePawnData(position.occupied.data);
 		}
 		//TODO: animation
 		currentPos.occupied = null;
@@ -46,7 +47,7 @@ public class Pawn : MonoBehaviour {
 	{
 		HomePoint temp = pawn.owner.firstHomePoint;
 		//find empty home spot
-		while(temp.occupied != null || temp.next != null)
+		while(temp.occupied != null && temp.next != null)
 		{
 			temp = (HomePoint)temp.next;
 		}
@@ -60,7 +61,7 @@ public class Pawn : MonoBehaviour {
 		////set home spot to occupied
 		//temp.occupied = this;
 		//move pawn to position
-		if (!Move(temp))
+		if (!pawn.Move(temp))
 		{
 			UnityEngine.Debug.LogError("SendPawnHome - Move home failed!");
 		}
