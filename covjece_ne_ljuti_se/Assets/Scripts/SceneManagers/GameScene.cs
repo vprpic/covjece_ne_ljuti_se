@@ -8,7 +8,7 @@ using System;
 
 public class GameScene : MonoBehaviour {
 
-	private string playerName = "mon";
+	//private string playerName = "mon";
 
 	public static GameScene instance;
 	public List<Player> Players { get; set; }
@@ -44,7 +44,7 @@ public class GameScene : MonoBehaviour {
 		{
 			UnityEngine.Debug.LogError("GameScene Start() - gameConfig == null");
 		}
-		else if (Client.currentPlayer.ScreenName == playerName)
+		else if (Client.currentPlayer.Order == 2)
 		{
 			gameConfig.NumOfPlayers = players.Count;
 			gameConfig.IsRunning = true;
@@ -58,7 +58,7 @@ public class GameScene : MonoBehaviour {
 
 		currentPlayer = playerColors.Find(x => x.id == Client.currentPlayer.Order);
 
-		if (Client.currentPlayer.ScreenName == playerName)
+		if (Client.currentPlayer.Order == 2)
 		{
 			foreach (PlayerColor pc in playerColors)
 			{
